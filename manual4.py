@@ -11,16 +11,23 @@ def pr_board(board):
 while True:
 	pr_board(board)
 
-	x = int(input("x:"))
 
 	while True:
+		x = int(input(f"{talker.ficha}:"))
+		done = False
 		try:
 			for i in range(len(board)):
 				mmax = (len(board)-1)
 				if board[mmax-i][x] == " ":
+					done = True
 					board[mmax-i][x] = talker.ficha
 					break
-		
+
+		except:
+			pass
+		else:
+			if done:
+				break
 
 	pr_board(board)
 
