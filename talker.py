@@ -8,6 +8,26 @@ class Talker:
 		self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.connect()
 
+	def display_message(self, message):
+		print(f"Server: {message}")
+
+	def react(self, data):
+		if data[0] == "board":
+			return data[1]
+
+		if data[0] == "display_message":
+			self.display_message(data[1])
+			return False
+
+		return False
+
+	def recv(self, size=1024):
+		data = pickle.loads(self.conn.recv(size))
+
+		output = self.react(data)
+
+		return output
+
 	def connect(self):
 		print("Connecting", end="", flush=False)
 		while True:
@@ -22,7 +42,11 @@ class Talker:
 
 	def next(self):
 		self.recv_board = True
-		return pickle.loads(self.conn.recv(2024))
+		while True:
+			output = self.recv(1024)
+			if not output == False:
+				return output
+		
 
 	def send(self, board):
 		bits = pickle.dumps(board)
