@@ -13,11 +13,14 @@ while True:
 
 	x = int(input("x:"))
 
-	for i in range(len(board)):
-		mmax = (len(board)-1)
-		if board[mmax-i][x] == " ":
-			board[mmax-i][x] = talker.ficha
-			break
+	while True:
+		try:
+			for i in range(len(board)):
+				mmax = (len(board)-1)
+				if board[mmax-i][x] == " ":
+					board[mmax-i][x] = talker.ficha
+					break
+		
 
 	pr_board(board)
 

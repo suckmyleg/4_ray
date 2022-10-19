@@ -19,7 +19,6 @@ class Talker:
 				print("\rConnected")
 				break
 		self.ficha = self.conn.recv(10).decode("utf-8")
-		print("Ficha selected", self.ficha)
 
 	def next(self):
 		self.recv_board = True
@@ -27,10 +26,12 @@ class Talker:
 
 	def send(self, board):
 		bits = pickle.dumps(board)
-		print("Sending", len(bits), "bytes")
 		self.conn.sendall(bits)
 
 	def send_next(self, board=False):
-		if self.recv_board and not False:
-			self.send(board)
-		return self.next()
+		try:
+			if self.recv_board and not False:
+				self.send(board)
+			return self.next()
+		except:
+			self.connect()
