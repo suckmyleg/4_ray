@@ -4,17 +4,21 @@ talker = Talker("192.168.0.71")
 
 board = talker.send_next()
 
+def pr_board(board):
+    for i in range(len(board)):
+        print("|"+"|".join(board[i])+"|")
+
 while True:
-	print("\n\n\n")
-	for h in board:
-		for x in h:
-			print(x, end="", flush=False)
+	pr_board(board)
 
 	x = int(input("x:"))
 
-	for i in range(9):
-		if board[8-i][x] == " ":
-			board[8-i][x] = talker.ficha
+	for i in range(len(board)):
+		mmax = (len(board)-1)
+		if board[mmax-i][x] == " ":
+			board[mmax-i][x] = talker.ficha
 			break
+
+	pr_board(board)
 
 	board = talker.send_next(board)
