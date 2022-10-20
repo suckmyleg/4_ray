@@ -1,7 +1,7 @@
 from talker import Talker
 
 try:
-	talker = Talker("localhost")
+	talker = Talker("192.168.0.86")
 
 	board = talker.send_next()
 

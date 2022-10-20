@@ -3,9 +3,10 @@ import pickle
 import os
 
 class Talker:
-	def __init__(self, host, clear=True):
+	def __init__(self, host, clear=True, print_board=True):
 		self.host = host
 		self.recv_board = False
+		self.print_board = print_board
 		self.game_running = False
 		self.last_board = False
 		self.win = None
@@ -13,14 +14,17 @@ class Talker:
 		self.connect()
 
 	def pr_board(self, board):
-		self.last_board = board
-		if self.cls:
-			os.system("cls")
-		if len(board[0]) == 0:
-			return None
-		for i in range(len(board)):
-			print("|"+"|".join(board[i])+"|" + str(i))
-		print("|"+" ".join([str(a) for a in range(len(board[0]))])+"|")
+		try:
+			self.last_board = board
+			if self.cls:
+				os.system("cls")
+			if len(board[0]) == 0:
+				return None
+			for i in range(len(board)):
+				print("|"+"|".join(board[i])+"|" + str(i))
+			print("|"+" ".join([str(a) for a in range(len(board[0]))])+"|")
+		except:
+			pass
 
 	def change_mode(self, params):
 		os.system(f"mode {params[0]}, {params[1]}")
@@ -51,10 +55,12 @@ class Talker:
 			return True
 
 		if data[0] == "board":
+			self.last_board = data[1]
 			return data[1]
 
-		if data[0] == "pr_board":
-			self.pr_board(data[1])
+		if data[0] == "pr_board" and self.print_board:
+			if not data[1] == False:
+				self.pr_board(data[1])
 			return False
 
 		if data[0] == "win":
@@ -80,9 +86,9 @@ class Talker:
 			output = self.react(data)
 
 			return output
-		except:
+		except Exception as e:
 			self.game_running = False
-			print("Disconnected")
+			print("Disconnected due to", str(e))
 			return True
 
 	def connect(self):
@@ -102,10 +108,9 @@ class Talker:
 	def next(self):
 		self.recv_board = True
 		while self.game_running:
-			output = self.recv(250)
+			output = self.recv(300)
 			if not output == False:
-				return output
-		
+				return output		
 
 	def send(self, board):
 		bits = pickle.dumps(board)
