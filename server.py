@@ -2,6 +2,7 @@ import socket
 from pickle import *
 import juan_first_bot as juan_bot
 import time
+from threading import Thread as th
 
 class Player:
 	def __init__(self, conn, addr, ficha):
@@ -61,11 +62,72 @@ class Server:
 		except Exception as e:
 			input("Error trying to setup connection :" + str(e))
 
+	def ongoing_match(self, n_players, n_fichas, players):
+		try:
+			time.sleep(1)
+
+			bot = juan_bot.Bot()
+
+			board = [[" " for b in range(6)] for a in range(5)]
+
+			print("Board created")
+
+			game_unfinished = True
+
+			turns = 7*6
+
+			current_turn = 0
+
+			while game_unfinished:
+				for n in range(n_players):
+					current_turn += 1
+					print("Sending board to player", n+1)
+
+					player = players[n]
+
+					for player_ in players:
+						if not player == player_:
+							player_.show_board(board)
+
+					time.sleep(0.1)
+
+					player.send(board)
+
+					board = player.next()
+
+					if not board == False:
+						self.pr_board(board)
+					else:
+						print(f"Player with ficha {player.ficha} another value ({board})")
+
+					print("Checking board")
+
+					winner = bot.check_winner(board, n_fichas=n_fichas, fichas=self.fichas)
+
+					emp = current_turn == turns
+
+					if winner or emp:
+						print("Player", winner, "won.")
+						for player_ in players:
+							player_.show_board(board)
+							if player_.ficha == winner or emp:
+								player_.win()
+							else:
+								player_.loose()
+						game_unfinished = False
+						break
+		except Exception as e:
+			print(e)
+			for player in players:
+				try:
+					player.disconnected(str(e))
+				except:
+					pass
+
+
 	def start_match(self, n_players=3, n_fichas=4):
 
 		while True:
-			bot = juan_bot.Bot()
-
 			players = []
 			try:
 				for n in range(n_players):
@@ -74,54 +136,8 @@ class Server:
 					player = Player(conn, addr, self.fichas[n])
 					players.append(player)
 
-				board = [[" " for b in range(10)] for a in range(10)]
+				th(target=self.ongoing_match, args=(n_players, n_fichas, players)).start()
 
-				print("Board created")
-
-				game_unfinished = True
-
-				turns = 7*6
-
-				current_turn = 0
-
-				while game_unfinished:
-					for n in range(n_players):
-						current_turn += 1
-						print("Sending board to player", n+1)
-
-						player = players[n]
-
-						for player_ in players:
-							if not player == player_:
-								player_.show_board(board)
-
-						time.sleep(0.1)
-
-						player.send(board)
-
-						board = player.next()
-
-						if not board == False:
-							self.pr_board(board)
-						else:
-							print(f"Player with ficha {player.ficha} another value ({board})")
-
-						print("Checking board")
-
-						winner = bot.check_winner(board, n_fichas=n_fichas, fichas=self.fichas)
-
-						emp = current_turn == turns
-
-						if winner or emp:
-							print("Player", winner, "won.")
-							for player_ in players:
-								player_.show_board(board)
-								if player_.ficha == winner or emp:
-									player_.win()
-								else:
-									player_.loose()
-							game_unfinished = False
-							break
 			except Exception as e:
 				print(e)
 				for player in players:
@@ -132,4 +148,4 @@ class Server:
 
 s = Server("192.168.0.86", 4545)
 
-s.start_match(4)
+s.start_match(2)
