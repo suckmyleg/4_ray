@@ -1,6 +1,6 @@
 import socket
 from pickle import *
-import juan_bot
+import juan_first_bot as juan_bot
 
 class Player:
 	def __init__(self, conn, addr, ficha):
@@ -26,10 +26,10 @@ class Player:
 		self.send_command("pr_board", board)
 
 	def win(self):
-		self.send_command("display_message", "You've won")
+		self.send_command("win", "You've won")
 
 	def loose(self):
-		self.send_command("display_message", "You've lost")
+		self.send_command("lost", "You've lost")
 		
 	def next(self):
 		return loads(self.conn.recv(2024))
