@@ -68,7 +68,7 @@ class Server:
 
 			bot = juan_bot.Bot()
 
-			board = [[" " for b in range(6)] for a in range(5)]
+			board = [[" " for b in range(6)] for a in range(7)]
 
 			print("Board created")
 
@@ -81,7 +81,7 @@ class Server:
 			while game_unfinished:
 				for n in range(n_players):
 					current_turn += 1
-					print("Sending board to player", n+1)
+					#print("Sending board to player", n+1)
 
 					player = players[n]
 
@@ -96,11 +96,13 @@ class Server:
 					board = player.next()
 
 					if not board == False:
-						self.pr_board(board)
+						pass
+						#self.pr_board(board)
 					else:
-						print(f"Player with ficha {player.ficha} another value ({board})")
+						#print(f"Player with ficha {player.ficha} another value ({board})")
+						pass
 
-					print("Checking board")
+					#print("Checking board")
 
 					winner = bot.check_winner(board, n_fichas=n_fichas, fichas=self.fichas)
 
@@ -126,7 +128,6 @@ class Server:
 
 
 	def start_match(self, n_players=3, n_fichas=4):
-
 		while True:
 			players = []
 			try:
@@ -135,9 +136,6 @@ class Server:
 					conn, addr = self.conn.accept()
 					player = Player(conn, addr, self.fichas[n])
 					players.append(player)
-
-				th(target=self.ongoing_match, args=(n_players, n_fichas, players)).start()
-
 			except Exception as e:
 				print(e)
 				for player in players:
@@ -145,7 +143,8 @@ class Server:
 						player.disconnected(str(e))
 					except:
 						pass
-
-s = Server("192.168.0.86", 4545)
+			else:
+				th(target=self.ongoing_match, args=(n_players, n_fichas, players)).start()
+s = Server("192.168.56.1", 4545)
 
 s.start_match(2)

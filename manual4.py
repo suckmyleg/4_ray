@@ -2,7 +2,7 @@ from talker import Talker
 
 while True:
 	try:
-		talker = Talker("192.168.0.86")
+		talker = Talker("192.168.56.1")
 
 		board = talker.send_next()
 
